@@ -353,8 +353,27 @@
 
     <script>
         // URL GOOGLE APPS SCRIPT DARI USER
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbSO1GekOBNwA5_Ocjo2GQ_UJhrmhryu0-3MdnAo4st33jQLuyn6ibg36vegybYmz8qg/exec";
+        // KIRIM HASIL KE GOOGLE SHEETS
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbSO1GekOBNwA5_Ocjo2GQ_UJhrmhryu0-3MdnAo4st33jQLuyn6ibg36vegybYmz8qg/exec";
 
+if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nama: playerName,
+            sekolah: schoolName,
+            level: `Level ${currentLevel}`,
+            skor: score,
+            status: statusText
+        })
+    }).then(() => {
+        console.log("Data berhasil terkirim!");
+    }).catch(err => {
+        console.error("Gagal mengirim data:", err);
+    });
+}
         // Data Soal Per Level
         const questionBank = {
             1: [
