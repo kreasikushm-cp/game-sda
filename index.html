@@ -199,8 +199,7 @@
                 </div>
             </div>
 
-            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                </div>
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
         </div>
 
         <div id="screen-result" class="hidden text-center space-y-4">
@@ -353,27 +352,8 @@
 
     <script>
         // URL GOOGLE APPS SCRIPT DARI USER
-        // KIRIM HASIL KE GOOGLE SHEETS
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbSO1GekOBNwA5_Ocjo2GQ_UJhrmhryu0-3MdnAo4st33jQLuyn6ibg36vegybYmz8qg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbSO1GekOBNwA5_Ocjo2GQ_UJhrmhryu0-3MdnAo4st33jQLuyn6ibg36vegybYmz8qg/exec";
 
-if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
-    fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            nama: playerName,
-            sekolah: schoolName,
-            level: `Level ${currentLevel}`,
-            skor: score,
-            status: statusText
-        })
-    }).then(() => {
-        console.log("Data berhasil terkirim!");
-    }).catch(err => {
-        console.error("Gagal mengirim data:", err);
-    });
-}
         // Data Soal Per Level
         const questionBank = {
             1: [
@@ -422,17 +402,15 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
         let activeQuestions = [];
         let score = 0;
         let timer = null;
-        let maxTime = 30; // Detik default
+        let maxTime = 30;
         let timeLeft = 30;
 
-        // Fungsi Memilih Layar
         function showScreen(screenId) {
             const screens = ['screen-main', 'screen-settings', 'screen-level', 'screen-game', 'screen-result', 'screen-certificate'];
             screens.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        // Pengaturan Timer
         function setTimerDuration(seconds) {
             maxTime = seconds;
             document.querySelectorAll('.timer-opt-btn').forEach(btn => {
@@ -445,7 +423,6 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             }
         }
 
-        // Cek Nama & Sekolah Lalu Lanjut ke Pilih Level
         function goToLevelSelect() {
             const inputName = document.getElementById('player-name').value.trim();
             const inputSchool = document.getElementById('school-name').value.trim();
@@ -456,13 +433,10 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             showScreen('screen-level');
         }
 
-        // Memulai Level Game
         function startLevel(levelNum) {
             currentLevel = levelNum;
             currentQuestionIndex = 0;
             score = 0;
-            
-            // Mengacak urutan soal dalam level
             activeQuestions = [...questionBank[currentLevel]].sort(() => Math.random() - 0.5);
 
             document.getElementById('game-level-info').innerText = `Level ${currentLevel}`;
@@ -470,7 +444,6 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             loadQuestion();
         }
 
-        // Memuat Soal Saat Ini
         function loadQuestion() {
             clearInterval(timer);
 
@@ -479,7 +452,6 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
                 return;
             }
 
-            // Reset Timer
             timeLeft = maxTime;
             updateTimerDisplay();
             
@@ -493,13 +465,11 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
                 }
             }, 1000);
 
-            // Tampilkan Data Soal
             const currentQ = activeQuestions[currentQuestionIndex];
             document.getElementById('question-number').innerText = currentQuestionIndex + 1;
             document.getElementById('question-text').innerText = currentQ.q;
             document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / activeQuestions.length) * 100}%`;
 
-            // Acak Opsi Jawaban
             const container = document.getElementById('options-container');
             container.innerHTML = '';
 
@@ -514,7 +484,6 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             });
         }
 
-        // Update UI Timer
         function updateTimerDisplay() {
             const timerBox = document.getElementById('timer-box');
             const timerText = document.getElementById('timer-text');
@@ -527,7 +496,6 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             }
         }
 
-        // Memeriksa Jawaban
         function checkAnswer(selectedOpt) {
             clearInterval(timer);
             const currentQ = activeQuestions[currentQuestionIndex];
@@ -542,13 +510,12 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             nextQuestion();
         }
 
-        // Pindah Soal
         function nextQuestion() {
             currentQuestionIndex++;
             loadQuestion();
         }
 
-        // Menyelesaikan Level
+        // FUNGSI UTAMA SAAT GAME SELESAI (KIRIM DATA KE GOOGLE SHEET)
         function finishLevel() {
             document.getElementById('result-score').innerText = score;
 
@@ -574,7 +541,7 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
                 certBtn.classList.add('hidden');
             }
 
-            // KIRIM HASIL KE GOOGLE SHEETS
+            // PROSES PENGIRIMAN DATA KE GOOGLE SHEET
             if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
                 fetch(SCRIPT_URL, {
                     method: 'POST',
@@ -588,7 +555,7 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
                         status: statusText
                     })
                 }).then(() => {
-                    console.log("Data hasil game berhasil dikirim ke Google Sheet!");
+                    console.log("Data berhasil terkirim!");
                 }).catch(err => {
                     console.error("Gagal mengirim data:", err);
                 });
@@ -597,12 +564,10 @@ if (SCRIPT_URL && SCRIPT_URL.trim() !== "") {
             showScreen('screen-result');
         }
 
-        // Coba Lagi
         function retryLevel() {
             startLevel(currentLevel);
         }
 
-        // Menerbitkan Sertifikat Digital
         function generateCertificate() {
             document.getElementById('cert-player-name').innerText = playerName;
             document.getElementById('cert-school-name').innerText = schoolName;
